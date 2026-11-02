@@ -2,6 +2,7 @@
 node_modules/
 
 # Archivos de entorno
+.env.example
 .env
 .env.local
 
@@ -12,3 +13,11 @@ Thumbs.db
 # Archivos de compilación de React
 dist/
 build/
+# SQLite y secretos locales
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+backend/data/
+.env.*
+!.env.example

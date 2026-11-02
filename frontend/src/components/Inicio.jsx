@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import { DollarSign, Package, AlertTriangle, TrendingUp, CalendarDays, Lightbulb } from 'lucide-react';
 
 export default function Inicio() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/estadisticas')
+    axios.get('/estadisticas')
       .then(res => setStats(res.data))
       .catch(err => console.error(err));
   }, []);
