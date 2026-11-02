@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import { Plus, X, PackagePlus } from 'lucide-react';
 
 export default function Productos({ productos, alGuardarProducto }) {
@@ -8,13 +8,13 @@ export default function Productos({ productos, alGuardarProducto }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:3001/api/productos', nuevoProducto)
+    axios.post('/productos', nuevoProducto)
       .then(() => {
         setMostrarFormulario(false);
         setNuevoProducto({ nombre: '', precio: '', stock: '', stockMinimo: '10' });
         alGuardarProducto();
       })
-      .catch(err => console.error(err));
+      .catch(err => alert(err.response?.data?.error || 'No se pudo guardar el producto'));
   };
 
   return (

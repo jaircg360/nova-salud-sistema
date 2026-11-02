@@ -1,5 +1,5 @@
 import { AlertTriangle, PlusCircle, CheckCircle2 } from 'lucide-react';
-import axios from 'axios';
+import axios from '../api';
 
 export default function Alertas({ productos, alReponerStock }) {
   const alertas = productos.filter(p => p.stock <= p.stockMinimo);
@@ -8,11 +8,11 @@ export default function Alertas({ productos, alReponerStock }) {
     const cantidad = window.prompt(`¿Cuántas unidades nuevas ingresaron de: ${nombre}?`);
     
     if (cantidad && !isNaN(cantidad) && parseInt(cantidad) > 0) {
-      axios.put(`http://localhost:3001/api/productos/${id}/reponer`, { cantidad: parseInt(cantidad) })
+      axios.put(`/productos/${id}/reponer`, { cantidad: parseInt(cantidad) })
         .then(() => {
           alReponerStock();
         })
-        .catch(err => alert("Error al reponer stock"));
+        .catch(err => alert(err.response?.data?.error || 'Error al reponer stock'));
     }
   };
 

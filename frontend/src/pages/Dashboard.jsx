@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, ShoppingCart, AlertTriangle, History, LogOut, Hexagon, LayoutDashboard } from 'lucide-react';
-import axios from 'axios';
+import { Package, ShoppingCart, AlertTriangle, History, LogOut, Hexagon, LayoutDashboard, FileBarChart } from 'lucide-react';
+import axios from '../api';
 
 // Importamos los componentes
 import Inicio from '../components/Inicio';
@@ -9,10 +9,12 @@ import Productos from '../components/Productos';
 import Alertas from '../components/Alertas';
 import PuntoVenta from '../components/PuntoVenta';
 import Historial from '../components/Historial';
+import Reportes from '../components/Reportes';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const usuario = localStorage.getItem('usuarioLogueado') || 'Invitado';
+  const [usuario, setUsuario] = useState('');
+  const [usuarioId, setUsuarioId] = useState(null);
   
   // CAMBIO: Ahora inicia en 'inicio' por defecto
   const [pestañaActiva, setPestañaActiva] = useState('inicio');
@@ -20,7 +22,7 @@ export default function Dashboard() {
   const [cantidadAlertas, setCantidadAlertas] = useState(0);
 
   const cargarDatos = () => {
-    axios.get('http://localhost:3001/api/productos')
+    return axios.get('/productos')
       .then(res => {
         setProductos(res.data);
         setCantidadAlertas(res.data.filter(p => p.stock <= p.stockMinimo).length);
@@ -28,11 +30,13 @@ export default function Dashboard() {
       .catch(err => console.error("Error al obtener productos", err));
   };
 
-  useEffect(() => { cargarDatos(); }, []);
+  useEffect(() => { cargarDatos(); axios.get('/auth/me').then(res => { setUsuario(res.data.nombre); setUsuarioId(res.data.id); }).catch(() => {}); }, []);
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('usuarioLogueado');
-    navigate('/');
+  const cerrarSesion = async () => {
+    try { await axios.post('/auth/logout'); }
+    catch { alert('No se pudo cerrar la sesión. Reintenta cuando se restablezca la conexión.'); return; }
+    sessionStorage.removeItem('novaToken');
+    navigate('/', { replace: true });
   };
 
   return (
@@ -44,7 +48,7 @@ export default function Dashboard() {
             <div className="bg-emerald-600 p-1.5 rounded-lg">
               <Hexagon size={20} className="text-white fill-white" />
             </div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">PeruFarma</h1>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Nova Salud</h1>
             <span className="hidden sm:inline-block ml-2 px-2 py-0.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-full border border-emerald-100">
               Sistema de Ventas
             </span>
@@ -65,7 +69,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Pestañas (Tabs) */}
-        <div className="flex space-x-1 bg-slate-200/50 p-1 rounded-xl mb-6 w-fit">
+        <div className="flex flex-wrap gap-1 bg-slate-200/50 p-1 rounded-xl mb-6 w-fit">
           
           {/* NUEVA PESTAÑA DE INICIO */}
           <TabButton icon={<LayoutDashboard size={16}/>} label="Inicio" active={pestañaActiva === 'inicio'} onClick={() => setPestañaActiva('inicio')} />
@@ -83,6 +87,7 @@ export default function Dashboard() {
           />
           
           <TabButton icon={<History size={16}/>} label="Historial" active={pestañaActiva === 'historial'} onClick={() => setPestañaActiva('historial')} />
+          <TabButton icon={<FileBarChart size={16}/>} label="Reportes" active={pestañaActiva === 'reportes'} onClick={() => setPestañaActiva('reportes')} />
         </div>
 
         {/* Panel de contenido */}
@@ -93,12 +98,13 @@ export default function Dashboard() {
             
             {pestañaActiva === 'productos' && <Productos productos={productos} alGuardarProducto={cargarDatos} />}
             
-            {pestañaActiva === 'ventas' && <PuntoVenta productos={productos} alRealizarVenta={cargarDatos} />}
+            {pestañaActiva === 'ventas' && usuarioId && <PuntoVenta key={usuarioId} usuarioId={usuarioId} productos={productos} alRealizarVenta={cargarDatos} />}
             
             {/* ACTUALIZADO: Le pasamos la función alReponerStock a Alertas */}
             {pestañaActiva === 'alertas' && <Alertas productos={productos} alReponerStock={cargarDatos} />}
             
             {pestañaActiva === 'historial' && <Historial />}
+            {pestañaActiva === 'reportes' && <Reportes />}
           </div>
         </div>
       </main>

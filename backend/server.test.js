@@ -1,0 +1,54 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { mkdtempSync } = require('node:fs');
+const { rm } = require('node:fs/promises');
+const { tmpdir } = require('node:os');
+const { join } = require('node:path');
+const { openDatabase } = require('./database');
+const { hashPassword } = require('./password');
+const { createApp } = require('./server');
+test('autenticación, persistencia, transacciones y validación', async () => {
+ const dir = mkdtempSync(join(tmpdir(),'nova-test-'));
+ const file = join(dir,'test.sqlite');
+ let db = await openDatabase(file), server;
+ const start = async () => { server = createApp(db).listen(0,'127.0.0.1'); await new Promise(resolve => server.once('listening',resolve)); };
+ const stop = () => new Promise((resolve,reject) => server.close(err => err ? reject(err) : resolve()));
+ const call = async (route, method='GET', body, token) => {
+   const response = await fetch('http://127.0.0.1:'+server.address().port+'/api'+route,{method,headers:{'Content-Type':'application/json',...(token ? {Authorization:'Bearer '+token}: {})},body: body === undefined ? undefined : JSON.stringify(body)});
+   return { status: response.status, body: response.status===204 ? null : await response.json() };
+ };
+ try {
+   (await db.run('INSERT INTO usuarios (usuario,nombre,password) VALUES (?,?,?)', 'admin','Operador real',hashPassword('test-password-123')));
+   await start();
+   for (const route of ['/productos','ventas','/estadisticas','/auth/me']) assert.equal((await call(route.startsWith('/')?route:'/'+route)).status,401);
+   assert.equal((await call('/auth/login','POST',{usuario:'admin',password:'incorrecta'})).status,401);
+   const login=await call('/auth/login','POST',{usuario:'ADMIN',password:'test-password-123'});
+   assert.equal(login.status,200); const token=login.body.token;
+   assert.equal((await call('/auth/me','GET',undefined,token)).body.nombre,'Operador real');
+   assert.notEqual((await db.get('SELECT token FROM sesiones')).token,token);
+   assert.equal((await call('/productos','POST',{nombre:'Producto',precio:'1.50',stock:'5',stockMinimo:'2'},token)).status,201);
+   for (const body of [{nombre:'',precio:1,stock:0,stockMinimo:0},{nombre:'X',precio:true,stock:0,stockMinimo:0},{nombre:'X',precio:1.555,stock:0,stockMinimo:0}]) assert.equal((await call('/productos','POST',body,token)).status,400);
+   for (const cantidad of [-1,0,1.5,'2',null]) assert.equal((await call('/ventas','POST',{productoId:1,cantidad},token)).status,400);
+   assert.equal((await call('/ventas','POST',{productoId:1,cantidad:6},token)).status,409);
+   const sale=await call('/ventas','POST',{productoId:1,cantidad:2,vendedor:'Intruso'},token);
+   assert.equal(sale.body.venta.vendedor,'Operador real'); assert.equal(sale.body.venta.total,'3.00');
+   const concurrent=await Promise.all([call('/ventas','POST',{productoId:1,cantidad:2},token),call('/ventas','POST',{productoId:1,cantidad:2},token)]);
+   assert.deepEqual(concurrent.map(r=>r.status).sort(),[200,409]);
+   assert.equal((await call('/productos/abc/reponer','PUT',{cantidad:2},token)).status,400);
+   assert.equal((await call('/productos/1/reponer','PUT',{cantidad:-5},token)).status,400);
+   assert.equal((await call('/productos/1/reponer','PUT',{cantidad:3},token)).body.producto.stock,4);
+   const stats=await call('/estadisticas','GET',undefined,token); assert.equal(stats.body.totalVentasHoy,'6.00');
+   (await db.run('INSERT INTO ventas (fecha,productoId,producto,cantidad,totalCentavos,usuarioId,vendedor) VALUES (?,?,?,?,?,?,?)', '2000-01-01T00:00:00.000Z',1,'Producto',1,150,1,'Operador real'));
+   assert.equal((await call('/estadisticas','GET',undefined,token)).body.totalVentasHoy,'6.00');
+   await stop(); await db.close(); db=await openDatabase(file); await start();
+   assert.equal((await call('/productos','GET',undefined,token)).body[0].stock,4);
+   assert.equal((await call('/ventas','GET',undefined,token)).body.length,3);
+   assert.equal((await call('/auth/logout','POST',{},token)).status,204);
+   assert.equal((await call('/productos','GET',undefined,token)).status,401);
+   const again=await call('/auth/login','POST',{usuario:'admin',password:'test-password-123'});
+   (await db.run('UPDATE sesiones SET expira = 0'));
+   assert.equal((await call('/auth/me','GET',undefined,again.body.token)).status,401);
+   for(let i=0;i<10;i++) assert.equal((await call('/auth/login','POST',{usuario:'admin',password:'bad'})).status,401);
+   assert.equal((await call('/auth/login','POST',{usuario:'admin',password:'test-password-123'})).status,429);
+ } finally { if(server?.listening) await stop(); await db.close(); await rm(dir,{recursive:true,force:true,maxRetries:10,retryDelay:100}); }
+});
