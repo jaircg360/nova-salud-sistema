@@ -35,7 +35,7 @@ export default function Alertas({ productos, alReponerStock }) {
             <div key={prod.id} className="bg-white border border-amber-200 p-5 rounded-xl shadow-sm flex flex-col justify-between">
               <div>
                 <p className="font-bold text-slate-800">{prod.nombre}</p>
-                <div className="mt-2 flex gap-4 text-sm">
+                <div className="mt-2 flex flex-wrap gap-2 text-sm">
                   <p className="text-slate-500">Stock actual: <span className="font-bold text-red-600">{prod.stock}</span></p>
                   <p className="text-slate-500">Mínimo requerido: <span className="font-bold text-slate-700">{prod.stockMinimo}</span></p>
                 </div>

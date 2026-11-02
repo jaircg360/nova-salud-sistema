@@ -19,7 +19,7 @@ export default function Productos({ productos, alGuardarProducto }) {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Inventario de Productos</h2>
           <p className="text-sm text-slate-500 mt-1">Gestiona el stock y precios de la botica.</p>
@@ -67,7 +67,7 @@ export default function Productos({ productos, alGuardarProducto }) {
         </div>
       )}
 
-      <div className="border border-slate-200 rounded-xl overflow-hidden">
+      <div className="border border-slate-200 rounded-xl overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>

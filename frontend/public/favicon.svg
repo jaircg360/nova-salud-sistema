@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <title>Nova Salud</title>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="#059669"/>
-  <path d="M28 14h8a2 2 0 0 1 2 2v10h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H38v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V38H16a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h10V16a2 2 0 0 1 2-2Z" fill="#fff"/>
+  <title>PeruFarma</title>
+  <g transform="translate(1 3) scale(.31)">
+    <path d="M100 34C79-7 14-4 5 42C-8 101 52 143 100 180Z" fill="#d91430"/>
+    <path d="M100 34C121-7 186-4 195 42C208 101 148 143 100 180Z" fill="#0ba3b6"/>
+    <path d="M91 43h18a10 10 0 0 1 10 10v18h18a10 10 0 0 1 10 10v18a10 10 0 0 1-10 10h-18v18a10 10 0 0 1-10 10H91a10 10 0 0 1-10-10v-18H63a10 10 0 0 1-10-10V81a10 10 0 0 1 10-10h18V53a10 10 0 0 1 10-10Z" fill="#fff"/>
+  </g>
 </svg>
