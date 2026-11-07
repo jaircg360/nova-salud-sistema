@@ -113,9 +113,9 @@ export default function Dashboard() {
         <div className="pf-dashboard-content">
           <div className="pf-dashboard-panel">
             {activa === 'inicio' && <Inicio />}
-            {activa === 'productos' && <Productos productos={productos} alGuardarProducto={cargarDatos} />}
+            {activa === 'productos' && <Productos usuarioId={usuarioId} productos={productos} alGuardarProducto={cargarDatos} />}
             {activa === 'ventas' && usuarioId && <PuntoVenta key={usuarioId} usuarioId={usuarioId} productos={productos} alRealizarVenta={cargarDatos} />}
-            {activa === 'alertas' && <Alertas productos={productos} alReponerStock={cargarDatos} />}
+            {activa === 'alertas' && <Alertas usuarioId={usuarioId} productos={productos} alReponerStock={cargarDatos} />}
             {activa === 'historial' && <Historial />}
             {activa === 'reportes' && <Reportes />}
           </div>

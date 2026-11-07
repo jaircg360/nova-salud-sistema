@@ -36,13 +36,14 @@ test('autenticación, persistencia, transacciones y validación', async () => {
    assert.deepEqual(concurrent.map(r=>r.status).sort(),[200,409]);
    assert.equal((await call('/productos/abc/reponer','PUT',{cantidad:2},token)).status,400);
    assert.equal((await call('/productos/1/reponer','PUT',{cantidad:-5},token)).status,400);
-   assert.equal((await call('/productos/1/reponer','PUT',{cantidad:3},token)).body.producto.stock,4);
+   assert.equal((await call('/productos/1/reponer','PUT',{cantidad:3,proveedor:'Distribuidora de prueba',fechaRecepcion:new Intl.DateTimeFormat('en-CA',{timeZone:'America/Lima'}).format(new Date()),clave:'reposicion-prueba-0001'},token)).body.producto.stock,4);
    const stats=await call('/estadisticas','GET',undefined,token); assert.equal(stats.body.totalVentasHoy,'6.00');
    (await db.run('INSERT INTO ventas (fecha,productoId,producto,cantidad,totalCentavos,usuarioId,vendedor) VALUES (?,?,?,?,?,?,?)', '2000-01-01T00:00:00.000Z',1,'Producto',1,150,1,'Operador real'));
    assert.equal((await call('/estadisticas','GET',undefined,token)).body.totalVentasHoy,'6.00');
    await stop(); await db.close(); db=await openDatabase(file); await start();
    assert.equal((await call('/productos','GET',undefined,token)).body[0].stock,4);
    assert.equal((await call('/ventas','GET',undefined,token)).body.length,3);
+   assert.equal((await call('/reposiciones','GET',undefined,token)).body[0].proveedor,'Distribuidora de prueba');
    assert.equal((await call('/auth/logout','POST',{},token)).status,204);
    assert.equal((await call('/productos','GET',undefined,token)).status,401);
    const again=await call('/auth/login','POST',{usuario:'admin',password:'test-password-123'});
