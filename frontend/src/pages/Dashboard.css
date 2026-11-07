@@ -1,0 +1,65 @@
+.pf-shell { min-height: 100vh; color: #1e293b; background: #f7f9fc; }
+.pf-desktop-sidebar { position: fixed; inset: 0 auto 0 0; width: 244px; z-index: 30; border-right: 1px solid #e5eaf0; background: #fff; }
+.pf-sidebar-inner { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 27px 17px 17px; background: #fff; }
+.pf-sidebar-brand { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 7px; }
+.pf-sidebar-brand img { display: block; width: 184px; max-width: 100%; height: auto; }
+.pf-sidebar-subtitle { margin: 8px 0 30px; padding: 0 11px; font-size: 12px; color: #718096; }
+.pf-sidebar-nav { display: grid; gap: 6px; overflow-y: auto; min-height: 0; padding-bottom: 20px; }
+.pf-sidebar-group { padding: 0 13px; margin: 0 0 9px; color: #8c98a8; font-size: 10px; font-weight: 650; letter-spacing: 1.4px; }
+.pf-nav-item { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 12px 13px; border: 0; border-radius: 10px; background: transparent; color: #5b687d; font: inherit; font-size: 14px; text-align: left; cursor: pointer; transition: background-color 140ms, color 140ms; }
+.pf-nav-item:hover { background: #f3f7fa; color: #172541; }
+.pf-nav-item > svg { flex-shrink: 0; }
+.pf-nav-active, .pf-nav-active:hover { background: #e9f7fa; color: #00869d; font-weight: 650; }
+.pf-nav-indicator { margin-left: auto; width: 5px; height: 5px; border-radius: 50%; background: #00869d; flex-shrink: 0; }
+.pf-nav-badge { margin-left: auto; border-radius: 7px; padding: 1px 7px; min-width: 24px; background: #fff1d7; color: #9a6211; text-align: center; font-size: 11px; font-weight: 650; }
+.pf-nav-badge + .pf-nav-indicator { margin-left: 0; }
+.pf-sidebar-bottom { margin-top: auto; padding-top: 18px; border-top: 1px solid #e9edf2; }
+.pf-sidebar-account { display: flex; align-items: center; gap: 10px; padding: 0 8px 15px; }
+.pf-user-avatar { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 36px; height: 36px; border-radius: 11px; background: #e8f5f8; color: #087e92; font-size: 12px; font-weight: 700; }
+.pf-sidebar-account > div { min-width: 0; }
+.pf-sidebar-account p { margin: 0; font-size: 13px; font-weight: 650; color: #26344b; overflow-wrap: anywhere; }
+.pf-sidebar-account div > span { font-size: 11px; color: #8390a1; }
+.pf-signout { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 13px; border: 0; border-radius: 9px; background: transparent; color: #6e7a8d; font: inherit; font-size: 13px; cursor: pointer; }
+.pf-signout:hover { color: #bd2742; background: #fff2f4; }
+.pf-signout:disabled { opacity: 0.55; cursor: wait; }
+.pf-sidebar-footer { margin: 18px 0 0; padding: 0 12px; font-size: 10px; color: #99a3b1; }
+.pf-sidebar-error { margin: 0 8px 10px; color: #b52240; font-size: 12px; }
+.pf-shell-workspace { margin-left: 244px; min-width: 0; }
+.pf-topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 81px; padding: 15px 30px; border-bottom: 1px solid #e5eaf0; background: #fff; }
+.pf-topbar-heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pf-breadcrumb { display: flex; align-items: center; gap: 5px; margin: 0 0 3px; color: #8390a1; font-size: 11px; }
+.pf-page-title { margin: 0; color: #233047; font-size: 17px; font-weight: 650; }
+.pf-topbar-account { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pf-topbar-name { max-width: 220px; color: #627085; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-dashboard-main { padding: 28px 30px 18px; }
+.pf-dashboard-content { container-type: inline-size; min-width: 0; max-width: 1450px; margin: 0 auto; }
+.pf-dashboard-panel { min-width: 0; min-height: 500px; padding: 25px; border: 1px solid #e1e7ee; border-radius: 16px; background: #fff; box-shadow: 0 2px 3px rgb(25 47 70 / 3%); }
+.pf-workspace-footer { margin-top: 23px; color: #99a3b1; text-align: center; font-size: 11px; }
+.pf-shell-icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; padding: 0; border: 1px solid #e2e8f0; border-radius: 10px; color: #596a80; background: #fff; cursor: pointer; }
+.pf-menu-trigger { display: none; }
+.pf-sidebar-drawer { inset: 0 auto 0 0; width: min(292px, calc(100vw - 32px)); max-width: none; height: 100vh; height: 100dvh; max-height: none; padding: 0; margin: 0; border: 0; color: #1e293b; background: #fff; box-shadow: 12px 0 50px rgb(15 23 42 / 15%); }
+.pf-sidebar-drawer::backdrop { background: rgb(16 30 50 / 42%); }
+.pf-sidebar-drawer .pf-sidebar-inner { padding-top: 20px; }
+.pf-sidebar-drawer .pf-sidebar-brand { padding: 0 1px; }
+.pf-shell button:focus-visible { outline: 2px solid #00869d; outline-offset: 3px; }
+.pf-skip-link { position: fixed; z-index: 100; top: 10px; left: 10px; transform: translateY(-160%); border-radius: 8px; padding: 10px 16px; color: #fff; background: #00869d; }
+.pf-skip-link:focus { transform: none; }
+@container (max-width: 1000px) { .pf-home-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (max-width: 540px) { .pf-home-metrics { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1023px) {
+  .pf-desktop-sidebar { display: none; }
+  .pf-shell-workspace { margin-left: 0; }
+  .pf-menu-trigger { display: inline-flex; }
+  .pf-topbar { padding: 13px 20px; min-height: 76px; }
+  .pf-dashboard-main { padding: 22px 20px 18px; }
+}
+@media (max-width: 600px) {
+  .pf-topbar { padding: 11px 14px; gap: 9px; }
+  .pf-topbar-heading { gap: 9px; }
+  .pf-topbar-name { display: none; }
+  .pf-breadcrumb { font-size: 10px; }
+  .pf-page-title { font-size: 16px; }
+  .pf-dashboard-main { padding: 16px 12px; }
+  .pf-dashboard-panel { padding: 17px 14px; border-radius: 13px; }
+}
+@media (prefers-reduced-motion: reduce) { .pf-nav-item { transition: none; } }
