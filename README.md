@@ -266,3 +266,17 @@ El historial muestra artículos, método de pago, importe recibido y vuelto cuan
 POST /api/ventas acepta items (productoId, cantidad, precioCentavos), metodoPago, recibidoCentavos y clave. GET /api/ventas devuelve operaciones agrupadas. GET /api/ventas/:id/comprobante descarga el comprobante autenticado; los identificadores son v-ID o h-ID. El formato de producto único anterior sigue aceptándose por compatibilidad, pero solo el nuevo contrato con clave garantiza reintentos sin duplicados.
 
 Pruebas adicionales verifican el carrito, cambio, métodos, manipulación de importes, precios desactualizados, concurrencia, reversión completa, compatibilidad de la base previa y repetición de solicitudes después de un reinicio.
+
+
+## Registro de abastecimiento y reposiciones
+
+En **Inventario → Reponer stock** o **Alertas → Reponer Stock**, el usuario registra:
+
+- Cantidad recibida, fecha de recepción y proveedor / razón social (obligatorios).
+- Documento de referencia, costo unitario de compra y observaciones (opcionales).
+
+El backend guarda en `reposiciones` el producto, proveedor, cantidades, stock anterior y posterior, fecha de recepción, fecha de registro y usuario responsable. El aumento de stock y su registro se confirman en una misma transacción. Una clave por solicitud evita duplicar ingresos al reintentar una operación cuya respuesta se perdió. El formulario conserva esa solicitud en la sesión del navegador hasta confirmar el resultado.
+
+El **Historial de abastecimiento** del Inventario muestra los últimos 100 ingresos y permite desplegar sus detalles. Las reposiciones anteriores a esta función no se reconstruyen; las existencias actuales se conservan. El proveedor se guarda como texto en cada ingreso y no requiere un catálogo previo. El costo es informativo y no modifica el precio de venta ni incorpora cálculos de utilidad a los reportes.
+
+La tabla se crea automáticamente al iniciar el backend actualizado, tanto en SQLite local como en Turso. No es necesario reiniciar ni borrar la base de datos. Para publicar esta función se deben desplegar los cambios del backend y del frontend.
