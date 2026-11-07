@@ -1,20 +1,12 @@
 import { AlertTriangle, PlusCircle, CheckCircle2 } from 'lucide-react';
-import axios from '../api';
+import { useState } from 'react';
+import ReponerStock from './ReponerStock';
 
-export default function Alertas({ productos, alReponerStock }) {
+export default function Alertas({ productos, alReponerStock, usuarioId }) {
   const alertas = productos.filter(p => p.stock <= p.stockMinimo);
 
-  const handleReponer = (id, nombre) => {
-    const cantidad = window.prompt(`¿Cuántas unidades nuevas ingresaron de: ${nombre}?`);
-    
-    if (cantidad && !isNaN(cantidad) && parseInt(cantidad) > 0) {
-      axios.put(`/productos/${id}/reponer`, { cantidad: parseInt(cantidad) })
-        .then(() => {
-          alReponerStock();
-        })
-        .catch(err => alert(err.response?.data?.error || 'Error al reponer stock'));
-    }
-  };
+  const [productoReponer,setProductoReponer] = useState(null);
+  const [aviso,setAviso] = useState('');
 
   return (
     <div className="animate-fade-in">
@@ -23,6 +15,7 @@ export default function Alertas({ productos, alReponerStock }) {
         <h2 className="text-xl font-bold text-slate-900">Alertas de Reposición</h2>
       </div>
       
+      {aviso && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">{aviso}</p>}
       {alertas.length === 0 ? (
         <div className="bg-emerald-50 border border-emerald-200 p-8 rounded-xl flex flex-col items-center justify-center text-center">
           <CheckCircle2 size={40} className="text-emerald-500 mb-3" />
@@ -35,13 +28,13 @@ export default function Alertas({ productos, alReponerStock }) {
             <div key={prod.id} className="bg-white border border-amber-200 p-5 rounded-xl shadow-sm flex flex-col justify-between">
               <div>
                 <p className="font-bold text-slate-800">{prod.nombre}</p>
-                <div className="mt-2 flex gap-4 text-sm">
+                <div className="mt-2 flex flex-wrap gap-2 text-sm">
                   <p className="text-slate-500">Stock actual: <span className="font-bold text-red-600">{prod.stock}</span></p>
                   <p className="text-slate-500">Mínimo requerido: <span className="font-bold text-slate-700">{prod.stockMinimo}</span></p>
                 </div>
               </div>
               <button 
-                onClick={() => handleReponer(prod.id, prod.nombre)}
+                disabled={!usuarioId} onClick={() => { setAviso(''); setProductoReponer(prod); }}
                 className="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 rounded-lg transition-colors flex justify-center items-center gap-2"
               >
                 <PlusCircle size={16} /> Reponer Stock
@@ -50,6 +43,7 @@ export default function Alertas({ productos, alReponerStock }) {
           ))}
         </div>
       )}
+      {productoReponer && <ReponerStock key={productoReponer.id} producto={productoReponer} usuarioId={usuarioId} onCerrar={() => setProductoReponer(null)} onGuardado={() => { alReponerStock(); setAviso('Ingreso registrado. Puedes consultar sus detalles en el historial de abastecimiento del Inventario.'); }} />}
     </div>
   );
 }

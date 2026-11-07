@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { reportesRouter } = require('./reportes');
 const { ventasRouter } = require('./ventas');
+const { reposicionesRouter } = require('./reposiciones');
 const { randomBytes, createHash } = require('node:crypto');
 const { openDatabase } = require('./database');
 const { hashPassword, verifyPassword } = require('./password');
@@ -61,19 +62,7 @@ function createApp(db) {
     const result = (await db.run('INSERT INTO productos (nombre, precioCentavos, stock, stockMinimo) VALUES (?, ?, ?, ?)', nombre.trim(),cents,Number(stock),Number(stockMinimo)));
     res.status(201).json((await db.get(productSelect + ' WHERE id = ?', result.lastInsertRowid)));
   });
-  app.put('/api/productos/:id/reponer', async (req,res) => {
-    if (!integer(Number(req.params.id),1)) return res.status(400).json({ error: 'ID inválido' });
-    const cantidad = req.body?.cantidad;
-    if (!integer(cantidad,1)) return res.status(400).json({ error: 'La cantidad debe ser un entero positivo' });
-    const result = await db.withTransaction(async tx => {
-      const p = await tx.get(productSelect + ' WHERE id = ?', Number(req.params.id));
-      if (!p) return { status: 404, body: { error: 'Producto no encontrado' } };
-      if (!integer(p.stock+cantidad)) return { status: 400, body: { error: 'Stock fuera de rango' } };
-      await tx.run('UPDATE productos SET stock = stock + ? WHERE id = ?', cantidad, p.id);
-      return { status: 200, body: { mensaje: 'Stock repuesto', producto: await tx.get(productSelect+' WHERE id = ?', p.id) } };
-    });
-    res.status(result.status).json(result.body);
-  });
+  app.use('/api', reposicionesRouter(db));
   app.use('/api/ventas', ventasRouter(db));
   app.get('/api/estadisticas', async (req,res) => {
     const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima' }).format(new Date());

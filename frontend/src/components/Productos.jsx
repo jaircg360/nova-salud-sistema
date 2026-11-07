@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import axios from '../api';
+import ReponerStock from './ReponerStock';
+import HistorialReposiciones from './HistorialReposiciones';
 import { Plus, X, PackagePlus } from 'lucide-react';
 
-export default function Productos({ productos, alGuardarProducto }) {
+export default function Productos({ productos, alGuardarProducto, usuarioId }) {
+  const [productoReponer, setProductoReponer] = useState(null);
+  const [versionIngresos, setVersionIngresos] = useState(0);
+  const [aviso, setAviso] = useState('');
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nuevoProducto, setNuevoProducto] = useState({ nombre: '', precio: '', stock: '', stockMinimo: '10' });
 
@@ -19,7 +24,7 @@ export default function Productos({ productos, alGuardarProducto }) {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Inventario de Productos</h2>
           <p className="text-sm text-slate-500 mt-1">Gestiona el stock y precios de la botica.</p>
@@ -67,7 +72,8 @@ export default function Productos({ productos, alGuardarProducto }) {
         </div>
       )}
 
-      <div className="border border-slate-200 rounded-xl overflow-hidden">
+      {aviso && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">{aviso}</p>}
+      <div className="border border-slate-200 rounded-xl overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
@@ -76,6 +82,7 @@ export default function Productos({ productos, alGuardarProducto }) {
               <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Precio</th>
               <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Stock</th>
               <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Estado</th>
+              <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Ingreso</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -96,11 +103,14 @@ export default function Productos({ productos, alGuardarProducto }) {
                     </span>
                   )}
                 </td>
+                <td className="px-6 py-4 text-right"><button type="button" disabled={!usuarioId} onClick={() => { setAviso(''); setProductoReponer(prod); }} className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50" aria-label={`Reponer ${prod.nombre}`}><PackagePlus size={16} /> Reponer stock</button></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <HistorialReposiciones version={versionIngresos} />
+      {productoReponer && <ReponerStock key={productoReponer.id} producto={productoReponer} usuarioId={usuarioId} onCerrar={() => setProductoReponer(null)} onGuardado={() => { alGuardarProducto(); setVersionIngresos(n=>n+1); setAviso('Ingreso registrado. El stock y el historial de abastecimiento se actualizaron.'); }} />}
     </div>
   );
 }
